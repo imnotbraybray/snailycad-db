@@ -3,14 +3,14 @@ FROM node:20-slim AS base
 WORKDIR /snailycad
 
 # Install pnpm globally and set config in one layer
-RUN npm install -g pnpm@8 && pnpm config set httpTimeout 1200000
+RUN npm install -g pnpm@9 && pnpm config set httpTimeout 1200000
 
 # Copy the rest of the source code
 COPY . ./
 
 FROM base AS deps
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 FROM deps AS build
 
