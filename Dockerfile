@@ -4,40 +4,24 @@ WORKDIR /snailycad
 # Install SSL certificates & OpenSSL
 RUN apt-get update -y && apt-get install -y ca-certificates openssl
 
-# Install pnpm globally and set config in one layer
+# Install pnpm globally
 RUN npm install -g pnpm@9 && pnpm config set httpTimeout 1200000
 
-# Copy the rest of the source code
-COPY . ./
+# Copy source code
+COPY . .
 
-FROM base AS deps
-
+# Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-FROM deps AS build
-
-ENV NODE_ENV="production"
-
-# Build all packages (this will also build the API and Client)
-RUN pnpm turbo run build --filter="{packages/*}"
-
-
-FROM build AS api
-ENV NODE_ENV="production"
-WORKDIR /snailycad/apps/api
-RUN pnpm run build
-CMD ["pnpm", "start"]
-
-FROM build AS client
-ENV NODE_ENV="production"
-WORKDIR /snailycad/apps/client
-RUN rm -rf /snailycad/apps/client/.next
-RUN pnpm create-images-domain
-
+# Pass Build Arguments for Next.js Frontend
 ARG NEXT_PUBLIC_CLIENT_URL
 ARG NEXT_PUBLIC_PROD_ORIGIN
 ENV NEXT_PUBLIC_CLIENT_URL=$NEXT_PUBLIC_CLIENT_URL
 ENV NEXT_PUBLIC_PROD_ORIGIN=$NEXT_PUBLIC_PROD_ORIGIN
+ENV NODE_ENV="production"
 
-RUN pnpm run build
-CMD ["pnpm", "start"]
+# Build all packages and apps (API & Client)
+RUN pnpm turbo run build
+
+# Start both API and Client concurrently from the root directory
+CMD ["pnpm", "run", "start"]
