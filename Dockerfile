@@ -33,5 +33,11 @@ ENV NODE_ENV="production"
 WORKDIR /snailycad/apps/client
 RUN rm -rf /snailycad/apps/client/.next
 RUN pnpm create-images-domain
+
+ARG NEXT_PUBLIC_CLIENT_URL
+ARG NEXT_PUBLIC_PROD_ORIGIN
+ENV NEXT_PUBLIC_CLIENT_URL=$NEXT_PUBLIC_CLIENT_URL
+ENV NEXT_PUBLIC_PROD_ORIGIN=$NEXT_PUBLIC_PROD_ORIGIN
+
 RUN pnpm run build
 CMD ["pnpm", "start"]
