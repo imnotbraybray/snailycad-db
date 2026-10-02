@@ -1,6 +1,8 @@
 FROM node:20-slim AS base
-
 WORKDIR /snailycad
+
+# Install SSL certificates & OpenSSL
+RUN apt-get update -y && apt-get install -y ca-certificates openssl
 
 # Install pnpm globally and set config in one layer
 RUN npm install -g pnpm@9 && pnpm config set httpTimeout 1200000
