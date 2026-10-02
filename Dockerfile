@@ -20,6 +20,11 @@ ENV NEXT_PUBLIC_CLIENT_URL=$NEXT_PUBLIC_CLIENT_URL
 ENV NEXT_PUBLIC_PROD_ORIGIN=$NEXT_PUBLIC_PROD_ORIGIN
 ENV NODE_ENV="production"
 
+# Force Next.js and API to bind to external interfaces
+ENV HOSTNAME="0.0.0.0"
+ENV PORT="10000"
+ENV PORT_API="8080"
+
 # Build all packages and apps (API & Client)
 RUN pnpm turbo run build
 
