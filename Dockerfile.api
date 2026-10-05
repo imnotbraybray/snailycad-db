@@ -11,7 +11,9 @@ ENV NODE_ENV="production"
 RUN pnpm turbo run build --filter="{packages/*}"
 
 WORKDIR /snailycad/apps/api
+# Pre-generate Prisma client during image build
 RUN pnpm prisma generate
 RUN pnpm run build
 
-CMD ["pnpm", "start"]
+# Direct startup command: run migrations then start the node server directly
+CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/main.js"]
