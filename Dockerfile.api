@@ -11,5 +11,7 @@ ENV NODE_ENV="production"
 RUN pnpm turbo run build --filter="{packages/*}"
 
 WORKDIR /snailycad/apps/api
+RUN pnpm prisma generate
 RUN pnpm run build
+
 CMD ["pnpm", "start"]
