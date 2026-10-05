@@ -1,0 +1,15 @@
+FROM node:20-slim AS base
+WORKDIR /snailycad
+
+RUN apt-get update -y && apt-get install -y ca-certificates openssl
+RUN npm install -g pnpm@9 && pnpm config set httpTimeout 1200000
+
+COPY . .
+RUN pnpm install --no-frozen-lockfile
+
+ENV NODE_ENV="production"
+RUN pnpm turbo run build --filter="{packages/*}"
+
+WORKDIR /snailycad/apps/api
+RUN pnpm run build
+CMD ["pnpm", "start"]
