@@ -1,7 +1,10 @@
 FROM node:20-slim AS base
 WORKDIR /snailycad
 
-RUN apt-get update -y && apt-get install -y ca-certificates openssl
+# Install SSL certificates, OpenSSL, and Git
+RUN apt-get update -y && apt-get install -y ca-certificates openssl git
+
+# Install pnpm globally
 RUN npm install -g pnpm@9 && pnpm config set httpTimeout 1200000
 
 COPY . .
@@ -11,9 +14,7 @@ ENV NODE_ENV="production"
 RUN pnpm turbo run build --filter="{packages/*}"
 
 WORKDIR /snailycad/apps/api
-# Pre-generate Prisma client during image build
 RUN pnpm prisma generate
 RUN pnpm run build
 
-# Direct startup command: run migrations then start the node server directly
 CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/main.js"]
